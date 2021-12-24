@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.util.Log
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Observer
+import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.kotlin.toObservable
 import io.reactivex.rxjava3.subjects.PublishSubject
@@ -19,7 +21,8 @@ class MainActivity : AppCompatActivity() {
 
         //test1()
         //test1_2()
-        test2()
+        //test2()
+        test2_2()
     }
 
     //https://www.jianshu.com/p/f6e7d2775bad
@@ -34,10 +37,19 @@ class MainActivity : AppCompatActivity() {
             onComplete = { Log.e(TAG, "Done: !") }
         )
     }
-
-    fun isEvenOrOdd(n: Int): String = if ((n % 2) == 0) "Even" else "Odd"  // 如果数字为偶数返回 "Even" 否则返回 "Odd"
+    /*
+    onCreate onNext: One
+    onCreate onNext: 2
+    onCreate onNext: Three
+    onCreate onNext: Four
+    onCreate onNext: 4.5
+    onCreate onNext: Five
+    onCreate onNext: 6.0
+    Done: !
+     */
 
     //https://www.jianshu.com/p/f6e7d2775bad
+    fun isEvenOrOdd(n: Int): String = if ((n % 2) == 0) "Even" else "Odd"  // 如果数字为偶数返回 "Even" 否则返回 "Odd"
     fun test1_2() {  // Subject 后续会提及
         val subject: Subject<Int> = PublishSubject.create()
 
@@ -47,14 +59,58 @@ class MainActivity : AppCompatActivity() {
         subject.onNext(4)
         subject.onNext(9)
     }
+    /*
+    The number is Even
+    The number is Odd
+     */
 
     //https://www.jianshu.com/p/a6b8c545505f
     fun test2() {
         val maybeValue: Maybe<Int> = Maybe.just(14)
         maybeValue.subscribeBy(
-            onComplete = { Log.e(TAG,("Completed Empty")) },
-            onError = { Log.e(TAG,("Error $it")) },
-            onSuccess = { Log.e(TAG,("Completed with value $it")) }
+            onComplete = { Log.e(TAG,("没有值的时候调用的函数")) },
+            onError = { Log.e(TAG,("出错处理函数 $it")) },
+            onSuccess = { Log.e(TAG,("有值的时候调用的函数,Completed with value $it")) }
         )
     }
+    /*
+    Completed with value 14
+     */
+
+    //https://www.jianshu.com/p/a6b8c545505f
+    val observer: Observer<Any> = object : Observer<Any> {
+        override fun onComplete() {
+            Log.e(TAG,("All Completed"))
+        }
+
+        override fun onNext(item: Any) {
+            Log.e(TAG,("Next $item"))
+        }
+
+        override fun onError(e: Throwable) {
+            Log.e(TAG,("Error Occured ${e.message}"))
+        }
+
+        override fun onSubscribe(d: Disposable) {
+            Log.e(TAG,("New Subscription "))
+        }
+    }
+    fun test2_2() {
+        val observable: Observable<Any> =
+            listOf("One", 2, "Three", "Four", 4.5, "Five", 6.0f).toObservable()
+        // toObservable 见下一节
+        observable.subscribe(observer)
+    }
+    /*
+    New Subscription
+    Next One
+    Next 2
+    Next Three
+    Next Four
+    Next 4.5
+    Next Five
+    Next 6.0
+    All Completed
+     */
+
 }
