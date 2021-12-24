@@ -23,7 +23,10 @@ class MainActivity : AppCompatActivity() {
         //test1_2()
         //test2()
         //test2_2()
-        test3()
+        //test3()
+        //test3_2()
+        //test3_3()
+        test3_4()
     }
 
     //https://www.jianshu.com/p/f6e7d2775bad
@@ -139,4 +142,50 @@ class MainActivity : AppCompatActivity() {
     All Completed
      */
 
+    //https://www.jianshu.com/p/6247968a9257
+    fun test3_2() {
+        val observable: Observable<Int> = Observable.create<Int> {
+            // it: ObservableEmitter<String!>
+            it.onNext(1)
+            it.onNext(2)
+            it.onNext(3)
+            it.onError(Exception("My Custom Exception"))
+        }
+
+        observable.subscribe(observer) // observer 同上一节
+    }
+    /*
+    New Subscription
+    Next 1
+    Next 2
+    Next 3
+    Error Occured My Custom Exception
+     */
+
+
+    fun test3_3() {
+        val observable: Observable<Int> = Observable.create<Int> {
+            it.onNext(1) // 其实它也可省,可以删除看看效果
+        }
+
+        observable.subscribe(observer)
+    }
+    /*
+    New Subscription
+    Next 1
+     */
+
+
+    fun test3_4() {
+        val observable: Observable<Int> = Observable.create<Int> {
+            it.onComplete()
+            it.onNext(1)    //只要it.onComplete()出现后，it.onNext(1) 就不起作用了
+        }
+
+        observable.subscribe(observer)
+    }
+    /*
+    New Subscription
+    All Completed
+     */
 }
