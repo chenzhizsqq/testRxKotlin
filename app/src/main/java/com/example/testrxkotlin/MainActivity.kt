@@ -45,7 +45,9 @@ class MainActivity : AppCompatActivity() {
         //test5_4()
         //test5_5()
         //test5_6()
-        test5_7()
+        //test5_7()
+        //test6_1()
+        test6_2()
     }
 
     //https://www.jianshu.com/p/f6e7d2775bad
@@ -590,4 +592,40 @@ class MainActivity : AppCompatActivity() {
         subject.subscribe(observer)
         subject.onComplete()
     }
+
+    //https://www.jianshu.com/p/06bf9dff0d75
+    //Operator 与 Marble Diagram
+    /*中文翻译
+    Operator 运算符
+    Marble Diagram 弹珠图*/
+
+
+    //Transforming	把 源 Observable 中的值进行变换后弹出	Map
+    // Map 是一种函数, 不是数据结构
+    fun test6_1() {
+        val observable = Observable.just(1, 2, 3)
+        observable.map { x -> 10 * x }.subscribe(observer)  // 这里完全可以用 10*it ,为了和下面的图片一致我没有这么做
+    }
+    /*
+    New Subscription
+    Next 10
+    Next 20
+    Next 30
+    All Completed
+     */
+
+
+    //Filter(Filtering)     把 源 Observable 中的值选择性地弹出
+    //下面就有条件添加
+    fun test6_2() {
+        val observable = Observable.just(2, 30, 22, 5, 60, 1)
+        observable.filter { x -> x > 10 }.subscribe(observer)  // it > 10
+    }
+    /*
+    New Subscription
+    Next 30
+    Next 22
+    Next 60
+    All Completed
+     */
 }
