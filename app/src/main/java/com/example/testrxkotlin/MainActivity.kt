@@ -11,6 +11,7 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.kotlin.toObservable
 import io.reactivex.rxjava3.subjects.PublishSubject
 import io.reactivex.rxjava3.subjects.Subject
+import java.util.concurrent.TimeUnit
 
 
 class MainActivity : AppCompatActivity() {
@@ -30,7 +31,9 @@ class MainActivity : AppCompatActivity() {
         //test3_5()
         //test3_6()
         //test3_7()
-        test3_8()
+        //test3_8()
+        test3_9()
+        //test3_10()
     }
 
     //https://www.jianshu.com/p/f6e7d2775bad
@@ -257,6 +260,23 @@ class MainActivity : AppCompatActivity() {
     }
     /*
     New Subscription
+    All Completed
+     */
+
+    //interval 隔一定的时间弹射一个值
+    fun test3_9() {
+        Observable.interval(600, TimeUnit.MILLISECONDS).subscribe(observer)
+        Thread.sleep(2000) // 要有这一行
+    }
+
+    //timer 一段时间后弹射一个值
+    fun test3_10() {
+        Observable.timer(20, TimeUnit.MILLISECONDS).subscribe(observer)
+        Thread.sleep(50) // 要有这一行
+    }
+    /*
+    New Subscription
+    Next 0
     All Completed
      */
 }
