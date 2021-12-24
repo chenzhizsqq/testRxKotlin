@@ -36,7 +36,10 @@ class MainActivity : AppCompatActivity() {
         //test3_10()
         //test3_11()
         //test4_1()
-        test4_2()
+        //test4_2()
+        //test4_3()
+        //test4_4()
+        test4_5()
     }
 
     //https://www.jianshu.com/p/f6e7d2775bad
@@ -367,5 +370,82 @@ class MainActivity : AppCompatActivity() {
     Received 4
     Disposed        //dispose 处理后不会执行 observer 的 onComplete 方法(所以 Complete 没有输出)
     Received 5      //执行废弃后，还会继续做完onNext(item: Long)那个函数，之后就全部中止废弃。
+     */
+
+    //Hot/Cold Observable
+    // Cold Observables 就是比较死板的，只要订阅了，全部的流程都会来一遍。
+    fun test4_3() {
+        val observable: Observable<Int> = listOf(1, 2, 3, 4).toObservable()
+        observable.subscribe(observer)
+        observable.subscribe(observer)
+    }
+    /*
+    New Subscription
+    Next 1
+    Next 2
+    Next 3
+    Next 4
+    All Completed
+    New Subscription
+    Next 1
+    Next 2
+    Next 3
+    Next 4
+    All Completed
+     */
+
+
+    //Hot Observable    这个就不会死板，一旦线程有空了，就会马上给你放
+    fun test4_4() {
+        val connectableObservable = listOf(1, 2, 3,4).toObservable().publish()  // 注释1
+        connectableObservable.subscribe { Log.e(TAG, "Subscription 1: $it") }  // 描点1
+        connectableObservable.subscribe { Log.e(TAG, "Subscription 2: $it") }  // 描点2
+        connectableObservable.connect() // 这里就是之前已经publish()创建和subscribe()配置后，就开始发送
+        connectableObservable.subscribe { Log.e(TAG, "Subscription 3: $it") }  // 注释3
+    }
+    /*
+    Subscription 1: 1
+    Subscription 2: 1
+    Subscription 1: 2
+    Subscription 2: 2
+    Subscription 1: 3
+    Subscription 2: 3
+    Subscription 1: 4
+    Subscription 2: 4
+     */
+
+    //Hot Observable中，因为用上了Thread.sleep(20)，所以Subscription 3的起步就慢。
+    // Subscription 3的显示是Subscription 3: 2，从2开始
+    fun test4_5() {
+        val connectableObservable = Observable.interval(10, TimeUnit.MILLISECONDS).publish()
+        connectableObservable.subscribe { Log.e(TAG, "Subscription 1: $it") }
+        connectableObservable.subscribe { Log.e(TAG, "Subscription 2: $it") }
+        connectableObservable.connect()  // ConnectableObservable 开始发送消息
+        Log.e(TAG, "Sleep 1 starts")
+        Thread.sleep(20)
+        Log.e(TAG, "Sleep 1 ends")
+        connectableObservable.subscribe { Log.e(TAG, "Subscription 3: $it") }  // 不用再次调用 connect 方法
+        Log.e(TAG, "Sleep 2 starts")
+        Thread.sleep(30)
+        Log.e(TAG, "Sleep 2 ends")
+    }
+    /*
+    Sleep 1 starts
+    Subscription 1: 0
+    Subscription 2: 0
+    Subscription 1: 1
+    Subscription 2: 1
+    Sleep 1 ends
+    Sleep 2 starts
+    Subscription 1: 2
+    Subscription 2: 2
+    Subscription 3: 2
+    Subscription 1: 3
+    Subscription 2: 3
+    Subscription 3: 3
+    Subscription 1: 4
+    Subscription 2: 4
+    Subscription 3: 4
+    Sleep 2 ends
      */
 }
