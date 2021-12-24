@@ -32,8 +32,9 @@ class MainActivity : AppCompatActivity() {
         //test3_6()
         //test3_7()
         //test3_8()
-        test3_9()
+        //test3_9()
         //test3_10()
+        test3_11()
     }
 
     //https://www.jianshu.com/p/f6e7d2775bad
@@ -268,6 +269,14 @@ class MainActivity : AppCompatActivity() {
         Observable.interval(600, TimeUnit.MILLISECONDS).subscribe(observer)
         Thread.sleep(2000) // 要有这一行
     }
+    /*
+    New Subscription
+    Next 0
+    Next 1
+    Next 2
+    Next 3
+    ...
+     */
 
     //timer 一段时间后弹射一个值
     fun test3_10() {
@@ -277,6 +286,18 @@ class MainActivity : AppCompatActivity() {
     /*
     New Subscription
     Next 0
+    All Completed
+     */
+
+    //range 一个范围内依次弹射
+    fun test3_11() {
+        Observable.range(4, 3).subscribe(observer)
+    }
+    /*
+    New Subscription
+    Next 4
+    Next 5
+    Next 6
     All Completed
      */
 }
