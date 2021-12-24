@@ -34,7 +34,9 @@ class MainActivity : AppCompatActivity() {
         //test3_8()
         //test3_9()
         //test3_10()
-        test3_11()
+        //test3_11()
+        //test4_1()
+        test4_2()
     }
 
     //https://www.jianshu.com/p/f6e7d2775bad
@@ -255,7 +257,7 @@ class MainActivity : AppCompatActivity() {
     just fromX 会自动弹射结束标志 (3.6.kt 3.7.kt 3.8.kt 中均有输出 All Completed)
      */
 
-    //empty 没有值
+    //Observable.empty 没有值类型的操作
     fun test3_8() {
         Observable.empty<String>().subscribe(observer)
     }
@@ -267,7 +269,7 @@ class MainActivity : AppCompatActivity() {
     //interval 隔一定的时间弹射一个值
     fun test3_9() {
         Observable.interval(600, TimeUnit.MILLISECONDS).subscribe(observer)
-        Thread.sleep(2000) // 要有这一行
+        Thread.sleep(2000) // 要有这一行，要不然会影响下个线程的操作
     }
     /*
     New Subscription
@@ -281,7 +283,7 @@ class MainActivity : AppCompatActivity() {
     //timer 一段时间后弹射一个值
     fun test3_10() {
         Observable.timer(20, TimeUnit.MILLISECONDS).subscribe(observer)
-        Thread.sleep(50) // 要有这一行
+        Thread.sleep(50) // 要有这一行，要不然会影响下个线程的操作
     }
     /*
     New Subscription
@@ -299,5 +301,71 @@ class MainActivity : AppCompatActivity() {
     Next 5
     Next 6
     All Completed
+     */
+
+    //https://www.jianshu.com/p/efc8fb38883c
+    //第四节 Observer Subscribe 与 Hot/Cold Observable
+    fun test4_1() {
+        val observable: Observable<Int> = Observable.range(1, 3)
+        observable.subscribe({  // 我知道你要问我为什么 subscribe 后面还可以接三个 Lambda,先看例子,下面说
+            //onNext method
+            Log.e(TAG, "Next $it")
+        }, {
+            //onError Method
+            Log.e(TAG, "Error ${it.message}")
+        }, {
+            //onComplete Method
+            Log.e(TAG, "All Completed")
+        })
+        //用这样的创建，创建时就没有onSubscribe函数的调用
+    }
+    /*
+    Next 1
+    Next 2
+    Next 3
+    All Completed
+     */
+
+    //Disposable 就是停止订阅，马上中止线程。其实就是相当于马上废弃当前线程。
+    fun test4_2() {
+
+        val observale: Observable<Long> = Observable.interval(100, TimeUnit.MILLISECONDS)
+
+        val observer: Observer<Long> = object : Observer<Long> {
+            lateinit var disposable: Disposable
+
+            override fun onSubscribe(d: Disposable) {
+                disposable = d
+            }
+
+            override fun onNext(item: Long) {
+                if (item >= 5 && !disposable.isDisposed) {
+                    disposable.dispose()
+                    Log.e(TAG, "Disposed")
+                }
+                Log.e(TAG, "Received $item")
+            }
+
+            override fun onError(e: Throwable) {
+                Log.e(TAG, "Error ${e.message}")
+            }
+
+            override fun onComplete() {
+                Log.e(TAG, "Complete")
+            }
+
+        }
+
+        observale.subscribe(observer)
+        Thread.sleep(1000)
+    }
+    /*
+    Received 0
+    Received 1
+    Received 2
+    Received 3
+    Received 4
+    Disposed        //dispose 处理后不会执行 observer 的 onComplete 方法(所以 Complete 没有输出)
+    Received 5      //执行废弃后，还会继续做完onNext(item: Long)那个函数，之后就全部中止废弃。
      */
 }
