@@ -22,7 +22,8 @@ class MainActivity : AppCompatActivity() {
         //test1()
         //test1_2()
         //test2()
-        test2_2()
+        //test2_2()
+        test3()
     }
 
     //https://www.jianshu.com/p/f6e7d2775bad
@@ -34,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         observable.subscribeBy(  // 1. 下面用到了 Kotlin 的命名参数  2. subscribe 后续会提及
             onNext = { Log.e(TAG, "onCreate onNext: $it") },
             onError = { Log.e(TAG, "onCreate onError: $it") },
-            onComplete = { Log.e(TAG, "Done: !") }
+            onComplete = { Log.e(TAG, "Done: !") },
         )
     }
     /*
@@ -77,6 +78,10 @@ class MainActivity : AppCompatActivity() {
     Completed with value 14
      */
 
+/*  Observable	可被观察的对象	电台
+    Observer	观察者	        收音机
+    subscribe	订阅	            调节收音机至电台频率
+    */
     //https://www.jianshu.com/p/a6b8c545505f
     val observer: Observer<Any> = object : Observer<Any> {
         override fun onComplete() {
@@ -110,6 +115,27 @@ class MainActivity : AppCompatActivity() {
     Next 4.5
     Next Five
     Next 6.0
+    All Completed
+     */
+
+
+    //https://www.jianshu.com/p/6247968a9257
+    fun test3() {
+        val observable: Observable<Int> = Observable.create<Int> {
+            // it: ObservableEmitter<String!>
+            it.onNext(1)
+            it.onNext(2)
+            it.onNext(3)
+            it.onComplete()
+        }
+
+        observable.subscribe(observer) // observer 同上一节
+    }
+    /*
+    New Subscription
+    Next 1
+    Next 2
+    Next 3
     All Completed
      */
 
