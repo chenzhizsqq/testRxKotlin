@@ -26,7 +26,11 @@ class MainActivity : AppCompatActivity() {
         //test3()
         //test3_2()
         //test3_3()
-        test3_4()
+        //test3_4()
+        //test3_5()
+        //test3_6()
+        //test3_7()
+        test3_8()
     }
 
     //https://www.jianshu.com/p/f6e7d2775bad
@@ -183,6 +187,73 @@ class MainActivity : AppCompatActivity() {
         }
 
         observable.subscribe(observer)
+    }
+    /*
+    New Subscription
+    All Completed
+     */
+
+    fun test3_5() {
+        val list = listOf(1, 2, 3, 4)
+        val observable: Observable<Int> = Observable.fromIterable(list)
+        // 我们也可以用 list.toObservable() 替代 Observable.fromIterable(list)
+        observable.subscribe(observer)
+    }
+    /*
+    New Subscription
+    Next 1
+    Next 2
+    Next 3
+    Next 4
+    All Completed
+     */
+
+    fun test3_6() {
+        Observable.just(54).subscribe(observer)
+        Observable.just(listOf(1, 2, 3)).subscribe(observer)
+        Observable.just(1, 2, 3).subscribe(observer)
+    }
+    /*
+    New Subscription
+    Next 54
+    All Completed
+    New Subscription
+    Next [1, 2, 3]
+    All Completed
+    New Subscription
+    Next 1
+    Next 2
+    Next 3
+    All Completed
+     */
+
+    fun test3_7() {
+        // 下面两者等效
+        Observable.just(1, 2, 3).subscribe(observer)
+        Observable.fromIterable(listOf(1, 2, 3)).subscribe(observer)
+    }
+    /*
+    New Subscription
+    Next 1
+    Next 2
+    Next 3
+    All Completed
+    New Subscription
+    Next 1
+    Next 2
+    Next 3
+    All Completed
+     */
+
+    /*  test3_7 与 test3_3 的对比
+    just fromX 与 create 的区别
+    create 中需要显式弹射结束标志(it.onComplete()),Observer 才会调用 onComplete 方法 (3.3.kt 中,没有 it.onComplete() 输出中就没有 All Completed)
+    just fromX 会自动弹射结束标志 (3.6.kt 3.7.kt 3.8.kt 中均有输出 All Completed)
+     */
+
+    //empty 没有值
+    fun test3_8() {
+        Observable.empty<String>().subscribe(observer)
     }
     /*
     New Subscription
