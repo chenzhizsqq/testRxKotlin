@@ -39,7 +39,10 @@ class MainActivity : AppCompatActivity() {
         //test4_2()
         //test4_3()
         //test4_4()
-        test4_5()
+        //test4_5()
+        //test5_1()
+        //test5_2()
+        test5_3()
     }
 
     //https://www.jianshu.com/p/f6e7d2775bad
@@ -373,7 +376,7 @@ class MainActivity : AppCompatActivity() {
      */
 
     //Hot/Cold Observable
-    // Cold Observables 就是比较死板的，只要订阅了，全部的流程都会来一遍。
+    // Cold Observables 就是比较死板的，只要订阅了，全部的流程都会来一遍。相当于单线程。
     fun test4_3() {
         val observable: Observable<Int> = listOf(1, 2, 3, 4).toObservable()
         observable.subscribe(observer)
@@ -395,7 +398,7 @@ class MainActivity : AppCompatActivity() {
      */
 
 
-    //Hot Observable    这个就不会死板，一旦线程有空了，就会马上给你放
+    //Hot Observable    这个就不会死板，一旦线程有空了，就会马上给你放。相当于多线程
     fun test4_4() {
         val connectableObservable = listOf(1, 2, 3,4).toObservable().publish()  // 注释1
         connectableObservable.subscribe { Log.e(TAG, "Subscription 1: $it") }  // 描点1
@@ -447,5 +450,73 @@ class MainActivity : AppCompatActivity() {
     Subscription 2: 4
     Subscription 3: 4
     Sleep 2 ends
+    ...
+     */
+
+    //第五章来了     Hot Observable 的另一种实现 ---- Subject
+    //https://www.jianshu.com/p/0dd221428626
+    fun test5_1() {
+        val observable = Observable.interval(10, TimeUnit.MILLISECONDS)
+        val subject = PublishSubject.create<Long>()  // 注释1
+
+        observable.subscribe(subject)  // 描点1 Subject 充当 Observer 角色
+        subject.subscribe { Log.e(TAG, "Received $it") }  // 描点2 Subject 充当 Observable 角色
+        Thread.sleep(60)
+    }
+    /*
+    Received 0
+    Received 1
+    Received 2
+    Received 3
+    Received 4
+    ...
+     */
+
+
+    //Subject 是 Hot Observable 的一种      是对应多线程的顺序，从零开始
+    fun test5_2() {
+        val observable = Observable.interval(100, TimeUnit.MILLISECONDS)
+
+        observable.subscribe { Log.e(TAG, "Subscription A Received $it") }
+        Thread.sleep(200)
+        observable.subscribe { Log.e(TAG, "Subscription B Received $it") }
+        Thread.sleep(300)
+    }
+    /*
+    Subscription A Received 0
+    Subscription A Received 1
+    Subscription A Received 2
+    Subscription B Received 0       //从零开始的
+    Subscription A Received 3
+    Subscription B Received 1
+    Subscription A Received 4
+    Subscription B Received 2
+    Subscription A Received 5
+    ...
+     */
+
+    //PublishSubject 是 Subject 的一种      不是对应顺序，从最后一个线程开始
+    //用作对比test5_2   PublishSubject
+    fun test5_3() {
+        val observable = Observable.interval(100, TimeUnit.MILLISECONDS)
+        val subject = PublishSubject.create<Long>()
+
+        observable.subscribe(subject)
+
+        subject.subscribe { Log.e(TAG, "Subscription A Received $it") }
+        Thread.sleep(300)
+        subject.subscribe { Log.e(TAG, "Subscription B Received $it") }
+        Thread.sleep(200)
+    }
+    /*
+    Subscription A Received 0
+    Subscription A Received 1
+    Subscription A Received 2
+    Subscription A Received 3
+    Subscription B Received 3        //有对比了，不是从0开始的
+    Subscription A Received 4
+    Subscription B Received 4
+    Subscription A Received 5
+    ...
      */
 }
