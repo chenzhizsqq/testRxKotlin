@@ -9,8 +9,7 @@ import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.kotlin.toObservable
-import io.reactivex.rxjava3.subjects.PublishSubject
-import io.reactivex.rxjava3.subjects.Subject
+import io.reactivex.rxjava3.subjects.*
 import java.util.concurrent.TimeUnit
 
 
@@ -42,7 +41,11 @@ class MainActivity : AppCompatActivity() {
         //test4_5()
         //test5_1()
         //test5_2()
-        test5_3()
+        //test5_3()
+        //test5_4()
+        //test5_5()
+        //test5_6()
+        test5_7()
     }
 
     //https://www.jianshu.com/p/f6e7d2775bad
@@ -519,4 +522,72 @@ class MainActivity : AppCompatActivity() {
     Subscription A Received 5
     ...
      */
+
+    //接收所有值,并把最后一个值从 Observable 接口处弹出去
+    fun test5_4() {
+        val observable = Observable.just(1, 2, 3, 4)
+        val subject = AsyncSubject.create<Int>()
+        observable.subscribe(subject)
+        subject.subscribe(observer)
+    }
+    /*
+    New Subscription
+    Next 4              //就是弹出最后一个值
+    All Completed
+     */
+
+    //AsyncSubject就算是多次订阅，也是直接跳到最后一个
+    fun test5_5() {
+        val subject = AsyncSubject.create<Int>()
+        subject.onNext(1)
+        subject.onNext(2)
+        subject.subscribe(observer)  // 订阅1
+        subject.onNext(3)
+        subject.subscribe(observer)  // 订阅2
+        subject.onNext(4)
+        subject.onComplete()
+    }
+    /*
+    New Subscription
+    New Subscription
+    Next 4  // 订阅1(我知道你要问为什么不输出 2 而是 4,下面有解释)
+    All Completed
+    Next 4  // 订阅2
+    All Completed
+     */
+
+
+    //BehaviorSubject 开始时，是跳到到订阅前的那个一个
+    fun test5_6() {
+        val subject = BehaviorSubject.create<Int>()
+        subject.onNext(1)
+        subject.onNext(2)
+        subject.subscribe(observer) // 订阅1
+        subject.onNext(3)
+        subject.subscribe(observer) // 订阅2
+        subject.onNext(4)
+        subject.onComplete()
+    }
+    /*
+    New Subscription
+    Next 2  // 订阅1 获取到了 `2`  而跳过了 `1`
+    Next 3  // 订阅1 获取到了订阅之后的值
+    New Subscription
+    Next 3  // 订阅2
+    Next 4  // 订阅1
+    Next 4  // 订阅2
+    All Completed
+    All Completed
+    */
+
+    //ReplaySubject  它和 Cold Observable 的性质差不多
+    fun test5_7() {
+        val subject = ReplaySubject.create<Int>()
+        subject.onNext(1)
+        subject.onNext(2)
+        subject.subscribe(observer)
+        subject.onNext(3)
+        subject.subscribe(observer)
+        subject.onComplete()
+    }
 }
