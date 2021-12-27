@@ -62,7 +62,12 @@ class MainActivity : AppCompatActivity() {
         //test7_4()
         //test7_5()
         //test7_6()
-        test7_7()
+        //test7_7()
+        //test8_1()
+        //test8_2()
+        //test8_3()
+        //test8_4()
+        test8_5()
     }
 
     //https://www.jianshu.com/p/f6e7d2775bad
@@ -954,4 +959,100 @@ class MainActivity : AppCompatActivity() {
     MainActivity: Done!
      */
 
+
+    //https://www.jianshu.com/p/36c720697829
+
+    inline fun Any.toIntOrError(): Int = toString().toInt()
+    // 把任意的对象转化为数字, 肯定有转化不了的(比如"haha"), 此时 toIntOrError 会抛出异常
+    // 这是 Kotlin 中的 `扩展方法` , 即, 可以给已有的类增加方法
+
+    fun test8_1() {
+        Observable.just(1, 2, "Errr", 3)  // 执行到 "Errr" 处会抛出异常, 那么 3 还会不会被传递下去呢?
+            .map { it.toIntOrError() }
+            .subscribe(observer)
+    }
+    /*
+    New Subscription
+    Next 1
+    Next 2                                  // Next 3 没有被输出
+    Error Occured For input string: "Errr"  // 执行了 onError 方法
+     */
+
+
+    //用一个指定值替换异常, 并且取消订阅
+    fun test8_2() {
+        Observable.just(1, 2, "Errr", 3)
+            .map { it.toIntOrError() }
+            .onErrorReturn { -1 }
+            .subscribe(observer)
+    }
+    /*
+    New Subscription
+    Next 1
+    Next 2
+    Next -1             // 并没有输出 Next 3
+    All Completed       // 执行了 observer 的 onComplete 方法
+     */
+
+
+    //在异常值处取消对原 Observable 的订阅, 并订阅另一个 Observable
+    fun  test8_3() {
+        Observable.just(1, 2, "Errr", 3)
+            .map { it.toIntOrError() }
+            .onErrorResumeWith (Observable.range(10, 2))  // 即订阅了 Observable.just(10,11)
+            .subscribe(observer)
+    }
+    /*
+    New Subscription
+    Next 1
+    Next 2
+    Next 10             // 并没有输出 Next 3
+    Next 11
+    All Completed       // 执行了 observer 的 onComplete 方法
+     */
+
+
+    //上游有异常会重新订阅, 直到达到 times。如果仍然没有恢复，则向下游抛出最后一次订阅产生的异常
+    fun  test8_4() {
+        Observable.just(1, 2, "Errr", 3)
+            .map { it.toIntOrError() }
+            .retry(2)  //重新订阅 2 次
+            .subscribe(observer)
+    }
+    /*
+    New Subscription
+    Next 1      \_    正常程序流程
+    Next 2      /
+    Next 1      \_    第一次重复尝试
+    Next 2      /
+    Next 1      \_    第二次重复尝试
+    Next 2      /       // 两次还不行就向下游抛出最后一次订阅产生的异常
+    Error Occured For input string: "Errr"
+     */
+
+
+    /*
+    第一个参数: 目前已经重新订阅的次数
+    第二个参数: 上游抛出的异常
+    返回值: 如果为 true 则继续重新订阅, 否则, 向下游抛出最后一次订阅产生的异常
+     */
+    fun test8_5() {
+        var retryCount = 0
+        Observable.just(1, 2, "Errr", 3)
+            .map { it.toIntOrError() }
+            .retry { _, _ ->
+                (++retryCount) < 3
+            }
+            .subscribe(observer)
+    }
+    /*
+    New Subscription
+    Next 1
+    Next 2
+    Next 1
+    Next 2
+    Next 1
+    Next 2
+    Error Occured For input string: "Errr"
+     */
 }
