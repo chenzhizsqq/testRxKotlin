@@ -6,6 +6,7 @@ import android.util.Log
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Observer
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.kotlin.toObservable
@@ -47,7 +48,13 @@ class MainActivity : AppCompatActivity() {
         //test5_6()
         //test5_7()
         //test6_1()
-        test6_2()
+        //test6_2()
+        //test6_3()
+        //test6_4()
+        //test6_5()
+        //test6_6()
+        //test6_7()
+        test6_8()
     }
 
     //https://www.jianshu.com/p/f6e7d2775bad
@@ -626,6 +633,88 @@ class MainActivity : AppCompatActivity() {
     Next 30
     Next 22
     Next 60
+    All Completed
+     */
+
+    //FlatMap(Transforming) 和 Kotlin List 的 flatMap 相似
+    fun test6_3(){
+        val observable = Observable.just(1, 5, 9)  // 数字没有特殊含义
+        observable
+            .flatMap { x -> Observable.just(x + 1, x + 2) }  // 这个例子非常牵强
+            .subscribe(observer)
+    }
+    /*
+    New Subscription
+    Next 2
+    Next 3
+    Next 6
+    Next 7
+    Next 10
+    Next 11
+    All Completed
+     */
+
+    //DefaultIfEmpty(Conditional and Boolean)
+    //当 Observable 中没有值的时候，我们订阅什么也得不到。比如下面的例子
+    fun test6_4() {
+        Observable.range(0, 10)
+            .filter { it > 15 }
+            .subscribe(observer)
+    }
+    /*
+    New Subscription
+    All Completed
+     */
+
+    //那如果我们想在 Observable 没有值的时候给出一个默认值呢, 见下例
+    fun test6_5() {
+        Observable.range(0, 10)
+            .filter { it > 15 }
+            .defaultIfEmpty(15)
+            .subscribe(observer)
+    }
+    /*
+    New Subscription
+    Next 15             //因为添加了.defaultIfEmpty(15)
+    All Completed
+     */
+
+    //开始时候是什么元素
+    fun test6_6() {
+        Observable.just(2, 3)
+            .startWithItem(1)       //开始时候是什么元素
+            .subscribe(observer)
+    }
+    /*
+    New Subscription
+    Next 1
+    Next 2
+    Next 3
+    All Completed
+     */
+
+    //数当前元素有多少各 sum
+    fun test6_7() {
+        // Single 会在之后介绍
+        val count: Single<Long> = Observable.just(2, 30, 22, 5, 60, 1).count()
+        // subscribeBy 会在之后介绍
+        count.subscribeBy { Log.e(TAG, it.toString()) }
+    }
+    //6
+
+    //Scan(和 Map 一样, 是 Transforming)
+    fun test6_8() {
+        Observable.just(1, 2, 3, 4, 5)
+            .scan { x, y -> x + y }
+            .subscribe(observer)
+    }
+    /*
+    New Subscription
+    Next 1
+    Next 3
+    Next 6
+    Next 10
+    Next 15
     All Completed
      */
 }
