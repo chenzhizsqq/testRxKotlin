@@ -54,7 +54,8 @@ class MainActivity : AppCompatActivity() {
         //test6_5()
         //test6_6()
         //test6_7()
-        test6_8()
+        //test6_8()
+        test6_9()
     }
 
     //https://www.jianshu.com/p/f6e7d2775bad
@@ -715,6 +716,22 @@ class MainActivity : AppCompatActivity() {
     Next 6
     Next 10
     Next 15
+    All Completed
+     */
+
+    //再来看一个 Scan 的例子 (这个例子是为了更进一步了解 Scan, 不是为了演示 Marble Diagram)
+    fun test6_9(){
+        Observable.just("1","2","3","4","5")
+            .scan { x, y -> x + " " + y  }
+            .subscribe(observer)
+    }
+    /*
+    New Subscription
+    Next 1
+    Next 1 2
+    Next 1 2 3
+    Next 1 2 3 4
+    Next 1 2 3 4 5
     All Completed
      */
 }
