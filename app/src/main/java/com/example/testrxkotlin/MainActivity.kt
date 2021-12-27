@@ -1,16 +1,16 @@
 package com.example.testrxkotlin
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import io.reactivex.rxjava3.core.Maybe
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.Observer
-import io.reactivex.rxjava3.core.Single
+import androidx.appcompat.app.AppCompatActivity
+import io.reactivex.rxjava3.core.*
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.kotlin.toObservable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.*
+import org.reactivestreams.Subscriber
+import org.reactivestreams.Subscription
 import java.util.concurrent.TimeUnit
 
 
@@ -55,7 +55,14 @@ class MainActivity : AppCompatActivity() {
         //test6_6()
         //test6_7()
         //test6_8()
-        test6_9()
+        //test6_9()
+        //test7_1()
+        //test7_2()
+        //test7_3()
+        //test7_4()
+        //test7_5()
+        //test7_6()
+        test7_7()
     }
 
     //https://www.jianshu.com/p/f6e7d2775bad
@@ -734,4 +741,217 @@ class MainActivity : AppCompatActivity() {
     Next 1 2 3 4 5
     All Completed
      */
+
+
+    /*
+    一个值被 Observable 弹出 -> 被 Observer 处理 -> 下一个值被弹出 -> ...
+    这是因为 Observable 和 Observer 运行在一个线程中,
+    所以在 Observer 没处理完上一个值之前 Observable 是不能弹出下一个值的。
+     */
+    fun test7_1(){
+        Observable.just(1,2,3).map { Item(it) }
+            .subscribe {
+                Log.e(TAG, "Received $it")
+                Thread.sleep(100)
+            }
+        Thread.sleep(1000)
+    }
+    /*
+    Item:  create 1
+    MainActivity: Received Item(id=1)
+    Item:  create 2
+    MainActivity: Received Item(id=2)
+    Item:  create 3
+    MainActivity: Received Item(id=3)
+     */
+
+
+    //这里只需要知道这一行代码使得 Observer 在另一个线程中运行即可
+    fun test7_2() {
+        Observable.just(1, 2, 3).map { Item(it) }
+            .observeOn(Schedulers.newThread())
+            .subscribe {
+                Thread.sleep(100)
+                Log.e(TAG, "Received $it")
+            }
+
+        Thread.sleep(1000)
+    }
+    /*
+    Item:  create 1
+    Item:  create 2
+    Item:  create 3
+    MainActivity: Received Item(id=1)
+    MainActivity: Received Item(id=2)
+    MainActivity: Received Item(id=3)
+     */
+
+    //这里是 Subscriber 而不是 Observer, 但是由于用的 Lambda 形式, 看起来一样。
+    fun test7_3() {
+        Flowable.just(1,2,3).map { Item(it) }
+            .observeOn(Schedulers.newThread())
+            .subscribe{
+                Thread.sleep(100)
+                Log.e(TAG, "Received $it")
+            }
+        Thread.sleep(1000)
+    }
+    /*
+    Item:  create 1
+    Item:  create 2
+    Item:  create 3
+    MainActivity: Received Item(id=1)
+    MainActivity: Received Item(id=2)
+    MainActivity: Received Item(id=3)
+     */
+    //暂时结果是一致，但是多的数据后，就不一样了。
+
+
+
+    //Flowable 不会一下子把所有值全部弹出, 它会一块一块的弹, 当 Subscriber 跟上时才会继续
+    //Flowable 会维护一个默认大小为 128 个元素的缓冲区, 被弹出的元素会暂存其中。如果满了 Flowable 就会暂时停止弹射。
+    fun test7_4() {
+        Flowable.range(1,260).map { Item(it) }
+            .observeOn(Schedulers.newThread())
+            .subscribe{
+                Thread.sleep(100)
+                Log.e(TAG, "Received $it")
+            }
+        Thread.sleep(2700)
+    }
+    /*
+    ...
+    Item:  create 126
+    Item:  create 127
+    Item:  create 128                   // 当 Flowable 弹出 128 个值就暂时停止了, 缓冲区达到上限(128)
+    MainActivity: Received Item(id=1)
+    MainActivity: Received Item(id=2)
+    MainActivity: Received Item(id=3)
+    MainActivity: Received Item(id=4)
+    MainActivity: Received Item(id=5)
+    ...
+    MainActivity: Received Item(id=95)
+    MainActivity: Received Item(id=96)  // Subscriber 仅仅处理了 96 个值, 缓冲区没有被清空
+    Item:  create 129
+    Item:  create 130
+    Item:  create 131
+    ...
+     */
+
+
+    //test7_5()中，调用
+    val subscriber_1 = object : Subscriber<Item> {
+        override fun onSubscribe(subscription: Subscription) {
+            subscription.request(4)  // 注释1  限定请求 4 个值。 如果删掉这一行, 我们就没有限定请求数量, 一个值都接收不到
+            Log.e(TAG,"New Subscription ")
+        }
+
+        override fun onNext(s: Item) {
+            Thread.sleep(200)
+            Log.e(TAG,"Subscriber received " + s)
+        }
+
+        override fun onError(e: Throwable) {
+            e.printStackTrace()
+        }
+
+        override fun onComplete() {
+            Log.e(TAG,"Done!")
+        }
+    }
+
+    fun test7_5() {
+        Flowable.range(1, 6)
+            .map { Item(it) }
+            .observeOn(Schedulers.newThread())
+            .subscribe(subscriber_1)
+        Thread.sleep(2000)
+    }
+    /*
+    MainActivity: New Subscription
+    Item:  create 1
+    Item:  create 2
+    Item:  create 3
+    Item:  create 4
+    Item:  create 5
+    Item:  create 6
+    MainActivity: Subscriber received Item(id=1)
+    MainActivity: Subscriber received Item(id=2)
+    MainActivity: Subscriber received Item(id=3)
+    MainActivity: Subscriber received Item(id=4)    //我们只请求 4 个值, 数据流并没有到结尾, 系统没有调用 onComplete 方法。
+     */
+
+
+    fun test7_6() {
+        Flowable.range(1, 4)            //改为4试一下
+            .map { Item(it) }
+            .observeOn(Schedulers.newThread())
+            .subscribe(subscriber_1)                //继续调用subscriber_1
+        Thread.sleep(2000)
+    }
+    /*
+    MainActivity: New Subscription
+    Item:  create 1
+    Item:  create 2
+    Item:  create 3
+    Item:  create 4
+    MainActivity: Subscriber received Item(id=1)
+    MainActivity: Subscriber received Item(id=2)
+    MainActivity: Subscriber received Item(id=3)
+    MainActivity: Subscriber received Item(id=4)
+    MainActivity: Done!                             //因为调用4个，所以这里可以Done了
+     */
+
+
+    val subscriber_2 = object : Subscriber<Item> {
+        lateinit var subscription: Subscription  // 与 subscriber_1 相比多了这一行
+        override fun onSubscribe(subscription: Subscription) {
+            this.subscription = subscription  // 与 subscriber_1 相比多了这一行
+            subscription.request(4)
+            Log.e(TAG,"New Subscription ")
+        }
+
+        override fun onNext(s: Item) {
+            Thread.sleep(200)
+            Log.e(TAG,"Subscriber received " + s)
+            if (s.id == 4) {                    // |\
+                Log.e(TAG,"Requesting two more")  // | \
+                subscription.request(2)         // | /--- 与 subscriber_1 相比多了这几行
+            }                                   // |/
+        }
+
+        override fun onError(e: Throwable) {
+            e.printStackTrace()
+        }
+
+        override fun onComplete() {
+            Log.e(TAG,"Done!")
+        }
+    }
+
+    fun test7_7() {
+        Flowable.range(1, 6)
+            .map { Item(it) }
+            .observeOn(Schedulers.newThread())
+            .subscribe(subscriber_2) // 只有这一行与 7.5.kt 相比有变动
+        Thread.sleep(2000)
+    }
+    /*
+    MainActivity: New Subscription
+    Item:  create 1
+    Item:  create 2
+    Item:  create 3
+    Item:  create 4
+    Item:  create 5
+    Item:  create 6
+    MainActivity: Subscriber received Item(id=1)
+    MainActivity: Subscriber received Item(id=2)
+    MainActivity: Subscriber received Item(id=3)
+    MainActivity: Subscriber received Item(id=4)
+    MainActivity: Requesting two more                   //因为在subscriber_2，在创建一个subscription，所以可以继续运行
+    MainActivity: Subscriber received Item(id=5)
+    MainActivity: Subscriber received Item(id=6)
+    MainActivity: Done!
+     */
+
 }
