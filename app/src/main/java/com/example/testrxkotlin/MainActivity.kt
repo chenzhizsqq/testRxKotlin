@@ -76,7 +76,8 @@ class MainActivity : AppCompatActivity() {
             listOf("One", 2, "Three", "Four", 4.5, "Five", 6.0f)  // 类型标注可省,这里添加是为了看得清楚,下同
         val observable: Observable<Any> = list.toObservable()  // Observable 后续会提及
 
-        observable.subscribeBy(  // 1. 下面用到了 Kotlin 的命名参数  2. subscribe 后续会提及
+        observable.subscribeBy(
+            // 1. 下面用到了 Kotlin 的命名参数  2. subscribe 后续会提及
             onNext = { Log.e(TAG, "onCreate onNext: $it") },
             onError = { Log.e(TAG, "onCreate onError: $it") },
             onComplete = { Log.e(TAG, "Done: !") },
@@ -94,12 +95,14 @@ class MainActivity : AppCompatActivity() {
      */
 
     //https://www.jianshu.com/p/f6e7d2775bad
-    fun isEvenOrOdd(n: Int): String = if ((n % 2) == 0) "Even" else "Odd"  // 如果数字为偶数返回 "Even" 否则返回 "Odd"
+    fun isEvenOrOdd(n: Int): String =
+        if ((n % 2) == 0) "Even" else "Odd"  // 如果数字为偶数返回 "Even" 否则返回 "Odd"
+
     fun test1_2() {  // Subject 后续会提及
         val subject: Subject<Int> = PublishSubject.create()
 
         subject.map { isEvenOrOdd(it) }  // map 后续会提及
-            .subscribe { Log.e(TAG,("The number is $it")) }
+            .subscribe { Log.e(TAG, ("The number is $it")) }
 
         subject.onNext(4)
         subject.onNext(9)
@@ -113,37 +116,38 @@ class MainActivity : AppCompatActivity() {
     fun test2() {
         val maybeValue: Maybe<Int> = Maybe.just(14)
         maybeValue.subscribeBy(
-            onComplete = { Log.e(TAG,("没有值的时候调用的函数")) },
-            onError = { Log.e(TAG,("出错处理函数 $it")) },
-            onSuccess = { Log.e(TAG,("有值的时候调用的函数,Completed with value $it")) }
+            onComplete = { Log.e(TAG, ("没有值的时候调用的函数")) },
+            onError = { Log.e(TAG, ("出错处理函数 $it")) },
+            onSuccess = { Log.e(TAG, ("有值的时候调用的函数,Completed with value $it")) }
         )
     }
     /*
     Completed with value 14
      */
 
-/*  Observable	可被观察的对象	电台
-    Observer	观察者	        收音机
-    subscribe	订阅	            调节收音机至电台频率
-    */
+    /*  Observable	可被观察的对象	电台
+        Observer	观察者	        收音机
+        subscribe	订阅	            调节收音机至电台频率
+        */
     //https://www.jianshu.com/p/a6b8c545505f
     val observer: Observer<Any> = object : Observer<Any> {
         override fun onComplete() {
-            Log.e(TAG,("All Completed"))
+            Log.e(TAG, ("All Completed"))
         }
 
         override fun onNext(item: Any) {
-            Log.e(TAG,("Next $item"))
+            Log.e(TAG, ("Next $item"))
         }
 
         override fun onError(e: Throwable) {
-            Log.e(TAG,("Error Occured ${e.message}"))
+            Log.e(TAG, ("Error Occured ${e.message}"))
         }
 
         override fun onSubscribe(d: Disposable) {
-            Log.e(TAG,("New Subscription "))
+            Log.e(TAG, ("New Subscription "))
         }
     }
+
     fun test2_2() {
         val observable: Observable<Any> =
             listOf("One", 2, "Three", "Four", 4.5, "Five", 6.0f).toObservable()
@@ -425,7 +429,7 @@ class MainActivity : AppCompatActivity() {
 
     //Hot Observable    这个就不会死板，一旦线程有空了，就会马上给你放。相当于多线程
     fun test4_4() {
-        val connectableObservable = listOf(1, 2, 3,4).toObservable().publish()  // 注释1
+        val connectableObservable = listOf(1, 2, 3, 4).toObservable().publish()  // 注释1
         connectableObservable.subscribe { Log.e(TAG, "Subscription 1: $it") }  // 描点1
         connectableObservable.subscribe { Log.e(TAG, "Subscription 2: $it") }  // 描点2
         connectableObservable.connect() // 这里就是之前已经publish()创建和subscribe()配置后，就开始发送
@@ -650,7 +654,7 @@ class MainActivity : AppCompatActivity() {
      */
 
     //FlatMap(Transforming) 和 Kotlin List 的 flatMap 相似
-    fun test6_3(){
+    fun test6_3() {
         val observable = Observable.just(1, 5, 9)  // 数字没有特殊含义
         observable
             .flatMap { x -> Observable.just(x + 1, x + 2) }  // 这个例子非常牵强
@@ -732,9 +736,9 @@ class MainActivity : AppCompatActivity() {
      */
 
     //再来看一个 Scan 的例子 (这个例子是为了更进一步了解 Scan, 不是为了演示 Marble Diagram)
-    fun test6_9(){
-        Observable.just("1","2","3","4","5")
-            .scan { x, y -> x + " " + y  }
+    fun test6_9() {
+        Observable.just("1", "2", "3", "4", "5")
+            .scan { x, y -> x + " " + y }
             .subscribe(observer)
     }
     /*
@@ -748,13 +752,14 @@ class MainActivity : AppCompatActivity() {
      */
 
 
+    //https://www.jianshu.com/p/7203e3ce3d9a
     /*
     一个值被 Observable 弹出 -> 被 Observer 处理 -> 下一个值被弹出 -> ...
     这是因为 Observable 和 Observer 运行在一个线程中,
     所以在 Observer 没处理完上一个值之前 Observable 是不能弹出下一个值的。
      */
-    fun test7_1(){
-        Observable.just(1,2,3).map { Item(it) }
+    fun test7_1() {
+        Observable.just(1, 2, 3).map { Item(it) }
             .subscribe {
                 Log.e(TAG, "Received $it")
                 Thread.sleep(100)
@@ -793,9 +798,9 @@ class MainActivity : AppCompatActivity() {
 
     //这里是 Subscriber 而不是 Observer, 但是由于用的 Lambda 形式, 看起来一样。
     fun test7_3() {
-        Flowable.just(1,2,3).map { Item(it) }
+        Flowable.just(1, 2, 3).map { Item(it) }
             .observeOn(Schedulers.newThread())
-            .subscribe{
+            .subscribe {
                 Thread.sleep(100)
                 Log.e(TAG, "Received $it")
             }
@@ -812,13 +817,12 @@ class MainActivity : AppCompatActivity() {
     //暂时结果是一致，但是多的数据后，就不一样了。
 
 
-
     //Flowable 不会一下子把所有值全部弹出, 它会一块一块的弹, 当 Subscriber 跟上时才会继续
     //Flowable 会维护一个默认大小为 128 个元素的缓冲区, 被弹出的元素会暂存其中。如果满了 Flowable 就会暂时停止弹射。
     fun test7_4() {
-        Flowable.range(1,260).map { Item(it) }
+        Flowable.range(1, 260).map { Item(it) }
             .observeOn(Schedulers.newThread())
-            .subscribe{
+            .subscribe {
                 Thread.sleep(100)
                 Log.e(TAG, "Received $it")
             }
@@ -848,12 +852,12 @@ class MainActivity : AppCompatActivity() {
     val subscriber_1 = object : Subscriber<Item> {
         override fun onSubscribe(subscription: Subscription) {
             subscription.request(4)  // 注释1  限定请求 4 个值。 如果删掉这一行, 我们就没有限定请求数量, 一个值都接收不到
-            Log.e(TAG,"New Subscription ")
+            Log.e(TAG, "New Subscription ")
         }
 
         override fun onNext(s: Item) {
             Thread.sleep(200)
-            Log.e(TAG,"Subscriber received " + s)
+            Log.e(TAG, "Subscriber received " + s)
         }
 
         override fun onError(e: Throwable) {
@@ -861,7 +865,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onComplete() {
-            Log.e(TAG,"Done!")
+            Log.e(TAG, "Done!")
         }
     }
 
@@ -913,14 +917,14 @@ class MainActivity : AppCompatActivity() {
         override fun onSubscribe(subscription: Subscription) {
             this.subscription = subscription  // 与 subscriber_1 相比多了这一行
             subscription.request(4)
-            Log.e(TAG,"New Subscription ")
+            Log.e(TAG, "New Subscription ")
         }
 
         override fun onNext(s: Item) {
             Thread.sleep(200)
-            Log.e(TAG,"Subscriber received " + s)
+            Log.e(TAG, "Subscriber received " + s)
             if (s.id == 4) {                    // |\
-                Log.e(TAG,"Requesting two more")  // | \
+                Log.e(TAG, "Requesting two more")  // | \
                 subscription.request(2)         // | /--- 与 subscriber_1 相比多了这几行
             }                                   // |/
         }
@@ -930,7 +934,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun onComplete() {
-            Log.e(TAG,"Done!")
+            Log.e(TAG, "Done!")
         }
     }
 
@@ -996,10 +1000,10 @@ class MainActivity : AppCompatActivity() {
 
 
     //在异常值处取消对原 Observable 的订阅, 并订阅另一个 Observable
-    fun  test8_3() {
+    fun test8_3() {
         Observable.just(1, 2, "Errr", 3)
             .map { it.toIntOrError() }
-            .onErrorResumeWith (Observable.range(10, 2))  // 即订阅了 Observable.just(10,11)
+            .onErrorResumeWith(Observable.range(10, 2))  // 即订阅了 Observable.just(10,11)
             .subscribe(observer)
     }
     /*
@@ -1013,7 +1017,7 @@ class MainActivity : AppCompatActivity() {
 
 
     //上游有异常会重新订阅, 直到达到 times。如果仍然没有恢复，则向下游抛出最后一次订阅产生的异常
-    fun  test8_4() {
+    fun test8_4() {
         Observable.just(1, 2, "Errr", 3)
             .map { it.toIntOrError() }
             .retry(2)  //重新订阅 2 次
