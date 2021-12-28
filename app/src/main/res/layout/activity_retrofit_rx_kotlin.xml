@@ -22,10 +22,34 @@
             android:text="Retrofit RxKotlin result"
             android:padding="20dp" />
         <Button
+            android:id="@+id/Button1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="简单的例子，只有log显示结果"
+            android:padding="20dp" />
+        <Button
             android:id="@+id/Button2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="得到结果后，在前端实现"
+            android:padding="20dp" />
+        <Button
+            android:id="@+id/Button3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="扩展Observer"
+            android:padding="20dp" />
+        <Button
+            android:id="@+id/Button4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="连接器设置的创建"
+            android:padding="20dp" />
+        <Button
+            android:id="@+id/Button5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="在OkHttpClient中，追加数据LOG"
             android:padding="20dp" />
     </LinearLayout>
 
