@@ -51,6 +51,12 @@
             android:layout_height="wrap_content"
             android:text="在OkHttpClient中，追加数据LOG"
             android:padding="20dp" />
+        <Button
+            android:id="@+id/Button6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="把数据导入到viewModel中"
+            android:padding="20dp" />
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>

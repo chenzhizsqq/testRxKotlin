@@ -41,6 +41,12 @@ class RetrofitRxKotlinActivity : AppCompatActivity() {
         binding.Button4.setOnClickListener { test4() }
         binding.Button5.setOnClickListener { test5() }
 
+        binding.Button6.setOnClickListener { test6() }
+        //viewModel观察
+        viewModel.getDataList.observe(this, {
+            binding.result.text = it.toString()
+        })
+
     }
 
     //简单创建。但是得到结果后，不能在前端实现
@@ -178,6 +184,29 @@ class RetrofitRxKotlinActivity : AppCompatActivity() {
             .doOnNext {
                 Toast.makeText(this, "能够在logcat中，看到服务器连接的log", Toast.LENGTH_SHORT).show()
                 binding.result.text = it.toString()
+            }
+            .doOnError {
+            }
+            .subscribe()
+    }
+
+
+    private val viewModel = TestViewModel()
+    fun test6(){
+        val retrofit = Retrofit.Builder()
+            .baseUrl("http://zipcloud.ibsnet.co.jp/")
+            .addConverterFactory(GsonConverterFactory.create()) //把json转为gson，才可以直接用LiveData.postValue
+            .addCallAdapterFactory(RxJava3CallAdapterFactory.createWithScheduler(Schedulers.io()))
+            .build()
+
+        val service = retrofit.create(ApiClient::class.java)
+
+        service.getZipCode("0790177")
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext {
+                //把数据导入到viewModel中
+                viewModel.getDataList.postValue(it.results)
             }
             .doOnError {
             }
