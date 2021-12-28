@@ -16,10 +16,18 @@ import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
     val TAG = "MainActivity"
+
+    //返回到主目录上
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        finish()
+        return true
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         //test1()
         //test1_2()
         //test2()
