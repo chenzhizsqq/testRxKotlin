@@ -31,6 +31,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        //noinspection DataBindingWithoutKapt
         dataBinding = true
     }
 }
@@ -49,4 +50,28 @@ dependencies {
     implementation 'io.reactivex.rxjava3:rxkotlin:3.0.1'
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
     implementation 'com.jakewharton.rxbinding4:rxbinding:4.0.0'
+
+
+    //retrofit2
+    //就是需要使用retrofit2，一定要添加的库
+    implementation "com.squareup.retrofit2:retrofit:2.9.0"
+
+    //Retrofit Gson转换器
+    implementation "com.squareup.retrofit2:converter-gson:2.9.0"
+
+    //对应rxjava
+    implementation 'com.squareup.retrofit2:adapter-rxjava3:2.9.0'
+
+    //对应OkHttp
+    implementation "com.squareup.okhttp3:okhttp:4.9.0"
+
+    // Gson to convert raw JSON to pretty JSON
+    implementation 'com.google.code.gson:gson:2.8.6'
+
+
+    implementation 'com.squareup.retrofit2:converter-moshi:2.4.0'
+
+    implementation 'com.squareup.moshi:moshi:1.5.0'
+
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
 }

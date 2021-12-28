@@ -1,4 +1,4 @@
-package com.example.testrxkotlin
+package com.example.testrxkotlin.demo1
 
 import android.util.Log
 

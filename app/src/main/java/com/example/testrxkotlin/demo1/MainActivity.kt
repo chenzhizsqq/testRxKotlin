@@ -1,8 +1,9 @@
-package com.example.testrxkotlin
+package com.example.testrxkotlin.demo1
 
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.example.testrxkotlin.R
 import io.reactivex.rxjava3.core.*
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
