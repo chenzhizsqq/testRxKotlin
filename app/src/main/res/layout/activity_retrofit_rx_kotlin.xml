@@ -43,7 +43,7 @@
             android:id="@+id/Button4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="连接器设置的创建"
+            android:text="连接器设置器的设定"
             android:padding="20dp" />
         <Button
             android:id="@+id/Button5"

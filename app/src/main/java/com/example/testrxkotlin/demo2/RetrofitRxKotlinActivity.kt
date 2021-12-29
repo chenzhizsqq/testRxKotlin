@@ -17,16 +17,16 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 
-
-
 class RetrofitRxKotlinActivity : AppCompatActivity() {
     val TAG = "RetrofitRxKotlinActivity"
+
     //返回到主目录上
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         finish()
         return true
     }
+
     private lateinit var binding: ActivityRetrofitRxKotlinBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,7 +50,7 @@ class RetrofitRxKotlinActivity : AppCompatActivity() {
     }
 
     //简单创建。但是得到结果后，不能在前端实现
-    fun test1(){
+    fun test1() {
         val retrofit = Retrofit.Builder()
             .baseUrl("http://zipcloud.ibsnet.co.jp/")
             .addConverterFactory(GsonConverterFactory.create()) //把json转为gson，才可以直接用LiveData.postValue
@@ -58,15 +58,15 @@ class RetrofitRxKotlinActivity : AppCompatActivity() {
             .build()
 
         val service = retrofit.create(ApiClient::class.java)
-            service.getZipCode("0790177").subscribe ({
-                Log.e(TAG, "result: $it")
-            }, { error ->
-                error.message?.let { Log.e(TAG, it) }
-            })
+        service.getZipCode("0790177").subscribe({
+            Log.e(TAG, "result: $it")
+        }, { error ->
+            error.message?.let { Log.e(TAG, it) }
+        })
     }
 
     //得到结果后，在前端实现
-    fun test2(){
+    fun test2() {
         val retrofit = Retrofit.Builder()
             .baseUrl("http://zipcloud.ibsnet.co.jp/")
             .addConverterFactory(GsonConverterFactory.create()) //把json转为gson，才可以直接用LiveData.postValue
@@ -89,7 +89,7 @@ class RetrofitRxKotlinActivity : AppCompatActivity() {
 
 
     //得到结果后，在前端实现 扩展Observer
-    fun test3(){
+    fun test3() {
         val retrofit = Retrofit.Builder()
             //.client(build.build())
             .baseUrl("http://zipcloud.ibsnet.co.jp/")
@@ -104,7 +104,6 @@ class RetrofitRxKotlinActivity : AppCompatActivity() {
             .subscribe(observer)
     }
 
-
     val observer: Observer<Any> = object : Observer<Any> {
         override fun onComplete() {
             Log.e(TAG, ("All Completed"))
@@ -114,7 +113,7 @@ class RetrofitRxKotlinActivity : AppCompatActivity() {
         override fun onNext(item: Any) {
             Log.e(TAG, ("Next $item"))
 
-            binding.result.text=item.toString()
+            binding.result.text = item.toString()
         }
 
         override fun onError(e: Throwable) {
@@ -127,12 +126,13 @@ class RetrofitRxKotlinActivity : AppCompatActivity() {
     }
 
 
-    fun test4(){
+    //连接器设置器的设定
+    fun test4() {
         //连接器设置的创建
         val build = OkHttpClient.Builder()
-            .connectTimeout(60,TimeUnit.SECONDS)    //连接超时  SECONDS 秒
-            .writeTimeout(60,TimeUnit.SECONDS)      //写超时   SECONDS 秒
-            .readTimeout(60,TimeUnit.SECONDS)       //读取超时  SECONDS 秒
+            .connectTimeout(60, TimeUnit.SECONDS)    //连接超时  SECONDS 秒
+            .writeTimeout(60, TimeUnit.SECONDS)      //写超时   SECONDS 秒
+            .readTimeout(60, TimeUnit.SECONDS)       //读取超时  SECONDS 秒
 
         val retrofit = Retrofit.Builder()
             .client(build.build())                              //连接器设置的配置
@@ -154,12 +154,12 @@ class RetrofitRxKotlinActivity : AppCompatActivity() {
             .subscribe()
     }
 
-
-    fun test5(){
+    //在OkHttpClient中，追加数据LOG
+    fun test5() {
         val build = OkHttpClient.Builder()
-            .connectTimeout(60,TimeUnit.SECONDS)    //连接超时  SECONDS 秒
-            .writeTimeout(60,TimeUnit.SECONDS)      //写超时   SECONDS 秒
-            .readTimeout(60,TimeUnit.SECONDS)       //读取超时  SECONDS 秒
+            .connectTimeout(60, TimeUnit.SECONDS)    //连接超时  SECONDS 秒
+            .writeTimeout(60, TimeUnit.SECONDS)      //写超时   SECONDS 秒
+            .readTimeout(60, TimeUnit.SECONDS)       //读取超时  SECONDS 秒
 
         //接收log管理器
         val logging = HttpLoggingInterceptor {
@@ -190,9 +190,9 @@ class RetrofitRxKotlinActivity : AppCompatActivity() {
             .subscribe()
     }
 
-
+    //把数据导入到viewModel中
     private val viewModel = TestViewModel()
-    fun test6(){
+    fun test6() {
         val retrofit = Retrofit.Builder()
             .baseUrl("http://zipcloud.ibsnet.co.jp/")
             .addConverterFactory(GsonConverterFactory.create()) //把json转为gson，才可以直接用LiveData.postValue
