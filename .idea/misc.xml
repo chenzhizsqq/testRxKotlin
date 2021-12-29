@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/user/AndroidStudioProjects/testRxKotlin/app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_menu.xml" value="0.13451086956521738" />
         <entry key="app/src/main/res/layout/activity_retrofit_rx_kotlin.xml" value="0.13451086956521738" />
       </map>
     </option>

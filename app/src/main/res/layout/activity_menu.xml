@@ -12,20 +12,21 @@
         android:layout_height="wrap_content"
         android:focusable="true"
         android:focusableInTouchMode="true"
+        android:gravity="center"
         android:orientation="vertical">
-        <TextView
+        <Button
             android:id="@+id/testRxKotlinTextView"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="20dp"
             android:text="RxKotlin 例子不超过15行教程\n
 https://www.jianshu.com/p/f6e7d2775bad" />
-        <TextView
+        <Button
             android:id="@+id/RetrofitRxKotlinActivity"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="20dp"
-            android:text="Retrofit RxKotlin" />
+            android:text="测试Retrofit RxKotlin" />
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>
