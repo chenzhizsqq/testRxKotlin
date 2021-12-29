@@ -62,7 +62,6 @@ dependencies {
     //对应rxjava3
     implementation 'com.squareup.retrofit2:adapter-rxjava3:2.9.0'
 
-
     //对应rxjava2
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
 
@@ -71,7 +70,6 @@ dependencies {
 
     // Gson to convert raw JSON to pretty JSON
     implementation 'com.google.code.gson:gson:2.8.6'
-
 
     implementation 'com.squareup.retrofit2:converter-moshi:2.4.0'
 
